@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.springmvcproject;
+package com.mycompany.springmvcproject.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,13 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping;
  *
  * @author Ermishov
  */
-
 @Controller
-public class HelloController {
+public class SecondController {
     
-    @GetMapping("/hello-world")
-    public String sayHelo(){
-            return "hello-world";
-    }
-        
+    @GetMapping("/exit")
+    public String exit(){
+    return "second/exit";
+}
 }
