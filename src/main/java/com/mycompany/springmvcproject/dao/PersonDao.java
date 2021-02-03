@@ -7,7 +7,14 @@ package com.mycompany.springmvcproject.dao;
 
 import java.util.List;
 import com.mycompany.springmvcproject.models.Person;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,37 +23,77 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class PersonDao {
-    private List<Person> people;
+
     private static int PEOPLE_COUNT = 0;
-    {
-        people = new ArrayList<>();
-        people.add(new Person( ++PEOPLE_COUNT, "name1", 20, "email1"));
-        people.add(new Person( ++PEOPLE_COUNT, "name2", 21, "email2"));
-        people.add(new Person( ++PEOPLE_COUNT, "name3", 22, "email3"));
-        people.add(new Person( ++PEOPLE_COUNT, "name4", 23, "email4"));
+    private static final String URL = "jdbc:postgresql://localhost:5432/firstDb";
+    private static final String USERNAME = "postgres";
+    private static final String PASSWORD = "postgresql";
+
+    private static Connection connection;
+
+    static {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+
+        try {
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
-    
-    public List<Person> index(){
+
+    public List<Person> index() {
+        List<Person> people = new ArrayList<>();
+        try {
+            Statement statement = connection.createStatement();
+            String SQL = "select * from Person";
+            ResultSet resultSet = statement.executeQuery(SQL);
+
+            while (resultSet.next()) {
+                Person person = new Person();
+                person.setId(resultSet.getInt("id"));
+                person.setName(resultSet.getString("name"));
+                person.setAge(resultSet.getInt("age"));
+                person.setEmail(resultSet.getString("email"));
+
+                people.add(person);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
         return people;
     }
-    
-    public Person show(int id){
-        return people.stream().filter(person -> person.getId() == id).findAny().orElse(null);
+
+    public Person show(int id) {
+        //return people.stream().filter(person -> person.getId() == id).findAny().orElse(null);
+        return null;
     }
-    
-    public void save(Person person){
-        person.setId(++PEOPLE_COUNT);
-        people.add(person);
+
+    public void save(Person person) {
+        try {
+            //        person.setId(++PEOPLE_COUNT);
+//        people.add(person);
+            Statement statement = connection.createStatement();
+            String SQL = "insert into Person values(" + 1 + ",'" + person.getName() + 
+                    "'," + person.getAge() + ",'" + person.getEmail() + "')";
+            statement.executeUpdate(SQL);
+        } catch (SQLException ex) {
+            Logger.getLogger(PersonDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
-    public void update(int id, Person updatedPerson){
-        Person personToBeUpdated = show(id);
-        personToBeUpdated.setName(updatedPerson.getName());
-        personToBeUpdated.setAge(updatedPerson.getAge());
-        personToBeUpdated.setEmail(updatedPerson.getEmail());
+
+    public void update(int id, Person updatedPerson) {
+//        Person personToBeUpdated = show(id);
+//        personToBeUpdated.setName(updatedPerson.getName());
+//        personToBeUpdated.setAge(updatedPerson.getAge());
+//        personToBeUpdated.setEmail(updatedPerson.getEmail());
     }
-    
-    public void delete(int id){
-        people.removeIf(person -> person.getId() == id);
+
+    public void delete(int id) {
+//        people.removeIf(person -> person.getId() == id);
     }
 }
