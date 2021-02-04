@@ -7,6 +7,7 @@ package com.mycompany.springmvcproject.controllers;
 
 import com.mycompany.springmvcproject.dao.PersonDao;
 import com.mycompany.springmvcproject.models.Person;
+import java.sql.SQLException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -43,7 +44,7 @@ public class PeopleControllers {
     }
     
     @GetMapping("/{id}")
-    public String show(@PathVariable("id")int id, Model model){
+    public String show(@PathVariable("id")int id, Model model) throws SQLException{
         model.addAttribute("person", personDao.show(id));
         return "people/show";
     }
@@ -65,13 +66,13 @@ public class PeopleControllers {
     }
     
     @GetMapping("{id}/edit")
-    public String edit(Model model, @PathVariable("id") int id){
+    public String edit(Model model, @PathVariable("id") int id) throws SQLException{
         model.addAttribute("person", personDao.show(id));
         return "people/edit";
     }
     
     @PatchMapping("/{id}")
-    public String update(@Valid @ModelAttribute("person") Person person, BindingResult bindingResult, @PathVariable("id") int id){
+    public String update(@Valid @ModelAttribute("person") Person person, BindingResult bindingResult, @PathVariable("id") int id) throws SQLException{
         System.out.println(bindingResult.hasErrors());
         if(bindingResult.hasErrors()){
             return "people/edit";
